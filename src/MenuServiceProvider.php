@@ -43,6 +43,10 @@ class MenuServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom(
             __DIR__ . '/../resources/lang', 'menu-maker'
         );
+
+        if (! class_exists('Form', false)) { // in case the same php process is reused and the alias is already registered
+            class_alias(\PhpCollective\MenuMaker\Adapters\LaravelCollectiveFormAdapter::class, 'Form');
+        }
     }
 
     /**
