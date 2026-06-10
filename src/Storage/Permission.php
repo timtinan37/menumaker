@@ -60,7 +60,7 @@ class Permission extends Model
 
     public static function routes()
     {
-        return Cache::remember('routes', now()->addHour(), function () {
+        return collect(Cache::remember('routes', now()->addHour(), function () {
             $filterRoutes = [];
             $routes = Route::getRoutes();
             foreach ($routes as $route) {
@@ -69,8 +69,8 @@ class Permission extends Model
                 }
                 $filterRoutes[] = explode_route($route);
             }
-            return collect($filterRoutes);
-        });
+            return $filterRoutes;
+        }));
     }
 
     public static function excludedActionList()
@@ -89,9 +89,9 @@ class Permission extends Model
 
     public static function publicRoutes()
     {
-        return Cache::rememberForever('public-routes', function () {
-            return collect(self::public()->get()->toArray());
-        });
+        return collect(Cache::rememberForever('public-routes', function () {
+            return self::public()->get()->toArray();
+        }));
     }
 
     public static function actions()
