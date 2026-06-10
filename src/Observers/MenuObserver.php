@@ -2,11 +2,8 @@
 
 namespace PhpCollective\MenuMaker\Observers;
 
-
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Artisan;
 use PhpCollective\MenuMaker\Storage\Menu;
-use PhpCollective\MenuMaker\Storage\Role;
-use PhpCollective\MenuMaker\Jobs\RemoveUserMenuCache;
 
 class MenuObserver
 {
@@ -19,7 +16,7 @@ class MenuObserver
      */
     public function created(Menu $menu)
     {
-        $this->removeAdminCache();
+        $this->removeCache();
     }
 
     /**
@@ -30,8 +27,7 @@ class MenuObserver
      */
     public function updated(Menu $menu)
     {
-        $this->removeAdminCache();
-        $this->removeUserCache($menu);
+        $this->removeCache();
     }
 
     /**
@@ -42,43 +38,16 @@ class MenuObserver
      */
     public function deleting(Menu $menu)
     {
-        $this->removeAdminCache();
-        $this->removeUserCache($menu);
+        $this->removeCache();
     }
 
     /**
-     * Handle User Cache delete.
-     *
-     * @param  Menu  $menu
-     * @return void
-     */
-    private function removeUserCache(Menu $menu)
-    {
-        $menu->load('roles', 'roles.users');
-        $menu->roles->each(function ($role) {
-            $role->users->each(function ($user) {
-                RemoveUserMenuCache::dispatch($user);
-            });
-        });
-    }
-
-    /**
-     * Handle Admin User Cache delete.
+     * Handle Cache Clear.
      *
      * @return void
      */
-    private function removeAdminCache()
+    private function removeCache()
     {
-        Cache::forget('public-routes');
-
-        $admin = Role::with('users')->admin()->first();
-        if(! $admin)
-        {
-            return;
-        }
-
-        $admin->users->each(function ($user) {
-            RemoveUserMenuCache::dispatch($user);
-        });
+        Artisan::call('menu:clear');
     }
 }
