@@ -58,11 +58,34 @@ trait MenuMaker
 
     protected function getMenuItems()
     {
-        return Cache::rememberForever('menus.section.' . optional($this->section)->id . '.user.' . $this->id, function () {
-            return $this->admin()
+        $cached = Cache::rememberForever('menus.section.' . optional($this->section)->id . '.user.' . $this->id, function () {
+            $items = $this->admin()
                 ? $this->getAdminMenuItems()
                 : $this->getUserMenuItems();
+            return $this->menuTreeToArray($items);
         });
+
+        return $this->menuArrayToCollection($cached);
+    }
+
+    private function menuTreeToArray($collection): array
+    {
+        $result = [];
+        foreach ($collection as $key => $item) {
+            $item['children'] = $this->menuTreeToArray($item['children']);
+            $result[$key] = $item;
+        }
+        return $result;
+    }
+
+    private function menuArrayToCollection(array $items)
+    {
+        $collection = collect([]);
+        foreach ($items as $key => $item) {
+            $item['children'] = $this->menuArrayToCollection($item['children']);
+            $collection->put($key, $item);
+        }
+        return $collection;
     }
 
     private function getAdminMenuItems()
