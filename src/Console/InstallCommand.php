@@ -52,15 +52,17 @@ class InstallCommand extends Command
      */
     protected function registerMenuAuthorizationMiddleware()
     {
-        $kernelFile = file_get_contents(app_path('Http/Kernel.php'));
-        if (Str::contains($kernelFile, '\\PhpCollective\\MenuMaker\\Http\\Middleware\\VerifyMenuAuthorization::class')) {
+        $bootstrapFile = base_path('bootstrap/app.php');
+        $bootstrapContents = file_get_contents($bootstrapFile);
+
+        if (Str::contains($bootstrapContents, 'VerifyMenuAuthorization::class')) {
             return;
         }
 
-        file_put_contents(app_path('Http/Kernel.php'), str_replace(
-            "\\Illuminate\Auth\Middleware\Authorize::class,".PHP_EOL,
-            "\\Illuminate\Auth\Middleware\Authorize::class,".PHP_EOL."        'menu' => \\PhpCollective\MenuMaker\Http\Middleware\VerifyMenuAuthorization::class,".PHP_EOL,
-            $kernelFile
+        file_put_contents($bootstrapFile, str_replace(
+            '->withMiddleware(function (Middleware $middleware) {',
+            '->withMiddleware(function (Middleware $middleware) {'.PHP_EOL."        \$middleware->alias(['menu' => \\PhpCollective\\MenuMaker\\Http\\Middleware\\VerifyMenuAuthorization::class]);",
+            $bootstrapContents
         ));
     }
 }
