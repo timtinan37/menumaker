@@ -11,7 +11,7 @@ class MenuObserver
     /**
      * Handle the User "created" event.
      *
-     * @param  \App\Menu  $menu
+     * @param  Menu  $menu
      * @return void
      */
     public function created(Menu $menu)
@@ -22,7 +22,7 @@ class MenuObserver
     /**
      * Handle the Menu "updated" event.
      *
-     * @param  \App\Menu  $menu
+     * @param  Menu  $menu
      * @return void
      */
     public function updated(Menu $menu)
