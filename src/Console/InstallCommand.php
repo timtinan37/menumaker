@@ -40,29 +40,6 @@ class InstallCommand extends Command
             '--force'   => true
         ]);
 
-        $this->registerMenuAuthorizationMiddleware();
-
         $this->info('Menu scaffolding installed successfully.');
-    }
-
-    /**
-     * Register the Menu authorization middleware in the application Kernel file.
-     *
-     * @return void
-     */
-    protected function registerMenuAuthorizationMiddleware()
-    {
-        $bootstrapFile = base_path('bootstrap/app.php');
-        $bootstrapContents = file_get_contents($bootstrapFile);
-
-        if (Str::contains($bootstrapContents, 'VerifyMenuAuthorization::class')) {
-            return;
-        }
-
-        file_put_contents($bootstrapFile, str_replace(
-            '->withMiddleware(function (Middleware $middleware) {',
-            '->withMiddleware(function (Middleware $middleware) {'.PHP_EOL."        \$middleware->alias(['menu' => \\PhpCollective\\MenuMaker\\Http\\Middleware\\VerifyMenuAuthorization::class]);",
-            $bootstrapContents
-        ));
     }
 }
