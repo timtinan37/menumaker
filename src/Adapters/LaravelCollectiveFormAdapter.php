@@ -88,7 +88,7 @@ class LaravelCollectiveFormAdapter
     /**
      * Create a select box field.
      */
-    public static function select(string $name, array $list = [], $selected = null, array $options = []): HtmlString
+    public static function select(string $name, iterable $list = [], $selected = null, array $options = []): HtmlString
     {
         $select = html()->select($name, $list, $selected);
         return new HtmlString(self::applyAttributes($select, $options));
